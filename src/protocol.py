@@ -2,11 +2,32 @@ from typing import Protocol, runtime_checkable
 
 @runtime_checkable
 class GetTasks(Protocol):
+    """Protocol for task source implementations.
+    
+    Any class implementing this protocol must provide a get_tasks() method
+    that returns a list of task dictionaries.
+    """
 
-    def get_tasks(self) -> list:
+    def get_tasks(self) -> list[dict]:
+        """Returns a list of tasks.
+        
+        Returns:
+            list[dict]: List of task dictionaries with 'id' and 'payload' fields.
+        """
         pass
 
-def get_all_tasks(gens: list) -> list[dict]:
+def get_all_tasks(gens: list[GetTasks]) -> list[dict]:
+    """Collects all tasks from multiple task sources.
+    
+    Args:
+        gens (list[GetTasks]): List of objects implementing the GetTasks protocol.
+        
+    Returns:
+        list[dict]: Combined list of all tasks from all sources.
+        
+    Raises:
+        ValueError: If any object in gens does not implement the GetTasks protocol.
+    """
     final_tasks = []
     
     for gen in gens:
