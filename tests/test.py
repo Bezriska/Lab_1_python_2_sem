@@ -6,7 +6,7 @@ from src.generators import MachineGen, ApiGen, JsonGen
 from src.protocol import GetTasks, get_all_tasks
 
 
-# For coverage test use: pytest tests/test.py --cov=src --cov-report=term-missing
+# For coverage test use: 1)pip install pytest-cov 2)pytest tests/test.py --cov=src --cov-report=term-missing
 
 
 class TestMachineGen:
