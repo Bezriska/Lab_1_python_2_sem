@@ -24,7 +24,7 @@ Lab_1_python_2_sem/
 │   ├── generators.py       # Классы источников задач
 │   ├── protocol.py         # Протокол GetTasks и функция get_all_tasks
 │   └── main.py            # Точка входа
-├── tests/                  # Тесты (в разработке)
+├── tests/                  # Тесты
 └── README.md
 ```
 
