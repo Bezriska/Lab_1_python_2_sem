@@ -1,6 +1,6 @@
 import json
 import os
-from logger import logger
+from .logger import logger
 
 
 class MachineGen:

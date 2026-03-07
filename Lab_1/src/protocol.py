@@ -1,5 +1,5 @@
 from typing import Protocol, runtime_checkable
-from logger import logger
+from .logger import logger
 
 @runtime_checkable
 class GetTasks(Protocol):

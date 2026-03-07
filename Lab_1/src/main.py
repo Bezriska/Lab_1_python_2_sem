@@ -1,5 +1,5 @@
-from generators import ApiGen, MachineGen, JsonGen
-from protocol import get_all_tasks
+from .generators import ApiGen, MachineGen, JsonGen
+from .protocol import get_all_tasks
 import os
 
 api_gen = ApiGen()
