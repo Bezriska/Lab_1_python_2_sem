@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from collection import TaskQueue
 from task.task import Task
+# Для запуска тестов с покрытием: pytest tests/test_collection.py -v --cov=collection --cov-report=term-missing --import-mode=importlib
 
 
 # Fixtures
