@@ -2,6 +2,7 @@ import pytest # type: ignore
 import sys
 import os
 import datetime
+# Для теста с покрытием pytest tests/test.py -v --cov=src --cov-report=term-missing --import-mode=importlib
 
 # Add src path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
