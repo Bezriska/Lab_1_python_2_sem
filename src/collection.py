@@ -51,19 +51,10 @@ class TaskQueue:
         Yields:
             Task: task matching the filter condition
         """
-        if not status and not high_priority and not priority:
+        if status is None and high_priority is None and priority is None:
             raise ValueError("Choose one filter")
         
-        if status and high_priority and priority:
-            raise ValueError("Choose one filter")
-        
-        if high_priority and priority:
-            raise ValueError("Choose one filter")
-        
-        if status and priority:
-            raise ValueError("Choose one filter")
-        
-        if status and high_priority:
+        if sum([status is not None, high_priority is not None, priority is not None]) > 1:
             raise ValueError("Choose one filter")
 
         if status:
