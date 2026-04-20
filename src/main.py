@@ -1,71 +1,65 @@
-from collection import TaskQueue
+import asyncio
+from async_queue import TaskQueue
+from handler import LogHandler, EmailHandler
+from TaskExecutor import TaskExecutor
 from task.task import Task
 
 
-queue = TaskQueue()
+async def main() -> None:
+    print("  Async Task Executor — Demo")
 
-task1 = Task(1, "Fix bug", 2)
-task2 = Task(2, "Write tests", 4)
-task3 = Task(3, "Deploy", 5)
-task4 = Task(4, "Code review", 1, "In_progress")
-task5 = Task(5, "Update docs", 3, "Completed")
+    # Create tasks
+    task1 = Task(1, "Send welcome email", priority=5)
+    task2 = Task(2, "Generate monthly report", priority=3)
+    task3 = Task(3, "Clean up temp files", priority=1)
+    task4 = Task(4, "Backup database", priority=4)
+    task5 = Task(5, "Notify admin", priority=2)
 
-for task in [task1, task2, task3, task4, task5]:
-    queue.add_task(task)
+    # Demo 1: LogHandler
+    print("\n[Demo 1] LogHandler — tasks are written to LOG.log")
+
+    log_queue = TaskQueue()
+    for task in [task1, task2, task3]:
+        await log_queue.add_task(task)
+
+    print(f"Queue size before execution: {log_queue.size()}")
+
+    async with TaskExecutor(LogHandler(), log_queue) as executor:
+        await executor.execute()
+
+    print(f"Queue size after execution:  {log_queue.size()}")
+
+    # Demo 2: EmailHandler
+    print("\n[Demo 2] EmailHandler — tasks are sent via email (simulated)")
+
+    email_queue = TaskQueue()
+    for task in [task4, task5]:
+        await email_queue.add_task(task)
+
+    print(f"Queue size before execution: {email_queue.size()}")
+
+    async with TaskExecutor(EmailHandler(), email_queue) as executor:
+        await executor.execute()
+
+    print(f"Queue size after execution:  {email_queue.size()}")
+
+    # Demo 3: Error handling
+    print("\n[Demo 3] Error handling — on_error is called when handle() raises")
+
+    class BrokenHandler:
+        async def handle(self, task: Task) -> None:
+            raise ValueError(f"Cannot process task {task.id}")
+
+        async def on_error(self, task: Task, exception: Exception) -> None:
+            print(f"  [on_error] Caught error for task {task.id}: {exception}")
+
+    error_queue = TaskQueue()
+    await error_queue.add_task(Task(99, "Broken task", priority=2))
+
+    async with TaskExecutor(BrokenHandler(), error_queue) as executor:
+        await executor.execute()
+
+    print("  Demo complete. Check LOG.log for log entries.")
 
 
-
-print("=== 1. Iterating over queue ===")
-for task in queue:
-    print(f"  [{task.id}] {task.description} | priority={task.priority} | status={task.status}")
-
-
-print("\n=== 2. Repeated iteration ===")
-first_pass = [task.id for task in queue]
-second_pass = [task.id for task in queue]
-print(f"  First pass:  {first_pass}")
-print(f"  Second pass: {second_pass}")
-print(f"  Equal: {first_pass == second_pass}")
-
-
-print("\n=== 3. StopIteration demonstration ===")
-iterator = iter(queue)
-try:
-    while True:
-        task = next(iterator)
-        print(f"  Got: {task.description}")
-except StopIteration:
-    print("  Queue exhausted — StopIteration raised")
-
-
-print("\n=== 4. Lazy filter by status='In_progress' ===")
-for task in queue.filter(status="In_progress"):
-    print(f"  [{task.id}] {task.description}")
-
-
-print("\n=== 5. Lazy filter by high_priority ===")
-for task in queue.filter(high_priority=True):
-    print(f"  [{task.id}] {task.description} | priority={task.priority}")
-
-
-print("\n=== 6. Compatibility with list(), sum(), for ===")
-all_tasks = list(queue)
-print(f"  list(queue) -> {len(all_tasks)} tasks")
-
-total_priority = sum(task.priority for task in queue)
-print(f"  sum of priorities -> {total_priority}")
-
-count_ready = sum(1 for task in queue if task.is_ready)
-print(f"  ready tasks count -> {count_ready}")
-
-
-print("\n=== 7. ValueError on wrong filter ===")
-try:
-    list(queue.filter())
-except ValueError as e:
-    print(f"  No filter: {e}")
-
-try:
-    list(queue.filter(status="Created", high_priority=True))
-except ValueError as e:
-    print(f"  Two filters: {e}")
+asyncio.run(main())
